@@ -8,7 +8,7 @@ typedef struct Patient
     int patientID;
     char name[50];
     char disease[50];
-    int priority; // 1=High, 2=Medium, 3=Low
+    int priority;
     char checkInTime[20];
 } Patient;
 
@@ -43,6 +43,15 @@ void addNewPatient(Queue *q);
 void servePatient(Queue *q);
 void searchPatient(Queue *q);
 void displayStatistics();
+void clearInputBuffer();
+
+/* ==================== HELPER FUNCTION ==================== */
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
 
 /* ==================== QUEUE OPERATIONS ==================== */
 Queue *createQueue()
@@ -76,7 +85,7 @@ void enqueue(Queue *q, Patient p)
     q->rear = newNode;
     q->size++;
     savePatientToFile(p);
-    printf("\n✓ Patient %s added to queue (ID: %d)\n", p.name, p.patientID);
+    printf("\n+ Patient %s added to queue (ID: %d)\n", p.name, p.patientID);
 }
 
 Patient dequeue(Queue *q)
@@ -84,7 +93,7 @@ Patient dequeue(Queue *q)
     Patient empty = {0};
     if (isEmpty(q))
     {
-        printf("\n✗ Queue is empty!\n");
+        printf("\n- Queue is empty!\n");
         return empty;
     }
 
@@ -131,6 +140,7 @@ void loadPatientsFromFile()
     {
         printf("%s", line);
     }
+    printf("\n");
     fclose(file);
 }
 
@@ -142,13 +152,19 @@ void addNewPatient(Queue *q)
 
     printf("\n--- Register New Patient ---\n");
     printf("Enter patient name: ");
-    scanf(" %[^\n]", p.name);
+    fflush(stdout);
+    scanf("%49[^\n]", p.name);
+    clearInputBuffer();
 
     printf("Enter disease/complaint: ");
-    scanf(" %[^\n]", p.disease);
+    fflush(stdout);
+    scanf("%49[^\n]", p.disease);
+    clearInputBuffer();
 
     printf("Enter priority (1=High, 2=Medium, 3=Low): ");
+    fflush(stdout);
     scanf("%d", &p.priority);
+    clearInputBuffer();
 
     if (p.priority < 1 || p.priority > 3)
     {
@@ -156,7 +172,7 @@ void addNewPatient(Queue *q)
         printf("Invalid priority! Set to Low.\n");
     }
 
-    strcpy(p.checkInTime, "10:00 AM"); // Default time
+    strcpy(p.checkInTime, "10:00 AM");
     enqueue(q, p);
 }
 
@@ -164,7 +180,7 @@ void servePatient(Queue *q)
 {
     if (isEmpty(q))
     {
-        printf("\n✗ No patients in queue!\n");
+        printf("\n- No patients in queue!\n");
         return;
     }
 
@@ -175,14 +191,14 @@ void servePatient(Queue *q)
     printf("Disease: %s\n", p.disease);
     printf("Priority Level: %d\n", p.priority);
     printf("Check-in Time: %s\n", p.checkInTime);
-    printf("\n✓ Patient served successfully!\n");
+    printf("\n+ Patient served successfully!\n");
 }
 
 void displayQueue(Queue *q)
 {
     if (isEmpty(q))
     {
-        printf("\n✗ Queue is empty!\n");
+        printf("\n- Queue is empty!\n");
         return;
     }
 
@@ -206,13 +222,15 @@ void searchPatient(Queue *q)
 {
     if (isEmpty(q))
     {
-        printf("\n✗ Queue is empty!\n");
+        printf("\n- Queue is empty!\n");
         return;
     }
 
     int searchID;
     printf("\nEnter Patient ID to search: ");
+    fflush(stdout);
     scanf("%d", &searchID);
+    clearInputBuffer();
 
     Node *temp = q->front;
     int position = 1;
@@ -232,7 +250,7 @@ void searchPatient(Queue *q)
         position++;
     }
 
-    printf("\n✗ Patient with ID %d not found!\n", searchID);
+    printf("\n- Patient with ID %d not found!\n", searchID);
 }
 
 void displayStatistics()
@@ -256,6 +274,7 @@ void displayMenu()
     printf("| 7. Exit                              |\n");
     printf("+======================================+\n");
     printf("Enter choice (1-7): ");
+    fflush(stdout);
 }
 
 /* ==================== MAIN FUNCTION ==================== */
@@ -274,6 +293,7 @@ int main()
     {
         displayMenu();
         scanf("%d", &choice);
+        clearInputBuffer();
 
         switch (choice)
         {
@@ -302,12 +322,12 @@ int main()
             break;
 
         case 7:
-            printf("\n✓ Thank you for using Hospital Queue System!\n");
+            printf("\n+ Thank you for using Hospital Queue System!\n");
             printf("Exiting...\n");
             exit(0);
 
         default:
-            printf("\n✗ Invalid choice! Please enter 1-7.\n");
+            printf("\n- Invalid choice! Please enter 1-7.\n");
         }
     }
 
