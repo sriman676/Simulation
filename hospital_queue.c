@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 /* ==================== STRUCTURE DEFINITIONS ==================== */
 typedef struct Patient
@@ -117,11 +118,19 @@ void savePatientToFile(Patient p)
     FILE *file = fopen(PATIENT_FILE, "a");
     if (file == NULL)
     {
-        printf("Error: Cannot create log file!\n");
+        printf("Error: Cannot create log file! Error code: %d\n", errno);
         return;
     }
-    fprintf(file, "ID: %d | Name: %s | Disease: %s | Priority: %d | Time: %s\n",
-            p.patientID, p.name, p.disease, p.priority, p.checkInTime);
+
+    int written = fprintf(file, "ID: %d | Name: %s | Disease: %s | Priority: %d | Time: %s\n",
+                          p.patientID, p.name, p.disease, p.priority, p.checkInTime);
+
+    if (written < 0)
+    {
+        printf("Error writing to file!\n");
+    }
+
+    fflush(file); // Force write to disk
     fclose(file);
 }
 
